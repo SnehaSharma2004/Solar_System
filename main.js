@@ -59,32 +59,24 @@ const planetMeshes = planets.map(planet => {
   orbit.rotation.x = Math.PI / 2;
   scene.add(orbit);
 
-  // Planet names
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d');
-  context.font = '30px Arial';
-  context.fillStyle = 'white';
-  context.fillText(planet.name, 50, 50);
-  
-  const texture = new THREE.CanvasTexture(canvas);
-  const labelMaterial = new THREE.SpriteMaterial({ map: texture });
-  const label = new THREE.Sprite(labelMaterial);
-  label.scale.set(30, 15, 1);
-  scene.add(label);
-
-  // Randomly reverse direction for some planets
-  const direction = Math.random() > 0.5 ? 1 : -1;
-
-  return { mesh, distance: planet.distance, speed: planet.speed * direction, angle: Math.random() * Math.PI * 2, label };
+  return { mesh, distance: planet.distance, speed: planet.speed, angle: Math.random() * Math.PI * 2 };
 });
 
 // Jupiter's ring
 const jupiter = planetMeshes[4]; // Jupiter is the 5th planet
-const ringGeometry = new THREE.RingGeometry(15, 25, 64);
-const ringMaterial = new THREE.MeshBasicMaterial({ color: 0xffd700, side: THREE.DoubleSide });
-const jupiterRing = new THREE.Mesh(ringGeometry, ringMaterial);
+const jupiterRingGeometry = new THREE.RingGeometry(15, 25, 64);
+const jupiterRingMaterial = new THREE.MeshBasicMaterial({ color: 0xffd700, side: THREE.DoubleSide, transparent: true, opacity: 0.5 });
+const jupiterRing = new THREE.Mesh(jupiterRingGeometry, jupiterRingMaterial);
 jupiterRing.rotation.x = Math.PI / 2;
 scene.add(jupiterRing);
+
+// Saturn's ring
+const saturn = planetMeshes[5]; // Saturn is the 6th planet
+const saturnRingGeometry = new THREE.RingGeometry(20, 35, 64);
+const saturnRingMaterial = new THREE.MeshBasicMaterial({ color: 0xffd700, side: THREE.DoubleSide, transparent: true, opacity: 0.7 });
+const saturnRing = new THREE.Mesh(saturnRingGeometry, saturnRingMaterial);
+saturnRing.rotation.x = Math.PI / 3;
+scene.add(saturnRing);
 
 // Starfield background
 const starGeometry = new THREE.BufferGeometry();
@@ -109,11 +101,13 @@ function animate() {
     planet.angle += planet.speed;
     planet.mesh.position.x = Math.cos(planet.angle) * planet.distance;
     planet.mesh.position.z = Math.sin(planet.angle) * planet.distance;
-    planet.label.position.copy(planet.mesh.position).add(new THREE.Vector3(10, 10, 0));
   });
 
   // Update Jupiter's ring position
   jupiterRing.position.set(jupiter.mesh.position.x, 0, jupiter.mesh.position.z);
+
+  // Update Saturn's ring position
+  saturnRing.position.set(saturn.mesh.position.x, 0, saturn.mesh.position.z);
 
   controls.update();
   renderer.render(scene, camera);
